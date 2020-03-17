@@ -17,26 +17,18 @@ import java.util.*;
 
 public class Main {
 
-    interface RobustnessEvaluator{
+    static int MAX_RUNS;
+    static int SEED;
+    static int MAX_CHANGES;
+    static int CHANGE_FREQUENCY;
+    static int CHANGE_TYPE;
+    static int FUTURE_HORIZON;
+    static int ALGORITHM_ID;
+    static int POPULATION_SIZE;
+    static String OUTPUT_FILE;
 
-        double evaluate(RMPBI problem, double[] x);
-    }
-
-    static class PerfectEvaluator implements RobustnessEvaluator{
-
-        @Override
-        public double evaluate(RMPBI problem, double[] x) {
-            return problem.trueEval(x);
-        }
-    }
-
-    static class PresentEvaluator implements RobustnessEvaluator {
-
-        @Override
-        public double evaluate(RMPBI problem, double[] x) {
-            return problem.eval(x);
-        }
-    }
+    static int RUN_ID;
+    static double[] INITIAL_RECORD;
 
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
@@ -65,6 +57,27 @@ public class Main {
             }
         } catch (IllegalArgumentException exception) {
 
+        }
+    }
+
+    interface RobustnessEvaluator {
+
+        double evaluate(RMPBI problem, double[] x);
+    }
+
+    static class PerfectEvaluator implements RobustnessEvaluator {
+
+        @Override
+        public double evaluate(RMPBI problem, double[] x) {
+            return problem.trueEval(x);
+        }
+    }
+
+    static class PresentEvaluator implements RobustnessEvaluator {
+
+        @Override
+        public double evaluate(RMPBI problem, double[] x) {
+            return problem.eval(x);
         }
     }
 
@@ -117,21 +130,6 @@ public class Main {
             this.gf = Double.NEGATIVE_INFINITY;
         }
     }
-
-
-
-    static int MAX_RUNS;
-    static int SEED;
-    static int MAX_CHANGES;
-    static int CHANGE_FREQUENCY;
-    static int CHANGE_TYPE;
-    static int FUTURE_HORIZON;
-    static int ALGORITHM_ID;
-    static int POPULATION_SIZE;
-    static String OUTPUT_FILE;
-
-    static int RUN_ID;
-    static double[] INITIAL_RECORD;
 
     public static void runJinApproach() {
 
@@ -229,10 +227,7 @@ public class Main {
                 printPerformance(RUN_ID, currentChange, 1, problem.trueEval(swarm.gx));
                 iterInit = 2;
             }
-
-
         }
-
     }
 
     static class JinEvaluator implements RobustnessEvaluator {
@@ -487,7 +482,6 @@ public class Main {
         }
         System.out.println();
     }
-
 
     static void printHeadOfOutputFile(){
 
