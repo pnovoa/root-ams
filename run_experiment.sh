@@ -20,7 +20,7 @@ RESULT_ID=0
 for i in "${CHANGE_TYPE[@]}" ; do
     for j in "${FUTURE_HORIZON[@]}" ; do
       for k in "${ALGORITHM[@]}" ; do
-        for RUN_ID in {1..${MAX_RUNS}} ; do
+        for RUN_ID in {1.."${MAX_RUNS}"} ; do
           ((RESULT_ID+=1))
           OUTPUT_FILE="${OUTPUT_FOLDER}RESULT_${RESULT_ID}.CSV"
           ARG_LIST+=("-jar ${JAR_FILE} ${RUN_ID} ${SEED} ${MAX_CHANGES} ${CHANGE_FREQUENCY} ${i} ${j} ${k} ${POPULATION_SIZE} ${OUTPUT_FILE}")
