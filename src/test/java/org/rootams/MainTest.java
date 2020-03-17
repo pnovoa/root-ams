@@ -8,7 +8,7 @@ public class MainTest {
     public void main() {
 
 
-        Main.MAX_RUNS = 5;
+        Main.RUN_ID = 5;
         Main.SEED = 1;
         Main.MAX_CHANGES = 50;
         Main.CHANGE_FREQUENCY = 2500;
@@ -24,7 +24,7 @@ public class MainTest {
 
     @Test
     public void mainJin() {
-        Main.MAX_RUNS = 1;
+        Main.RUN_ID = 1;
         Main.SEED = 1;
         Main.MAX_CHANGES = 23;
         Main.CHANGE_FREQUENCY = 2500;

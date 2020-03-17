@@ -17,7 +17,7 @@ import java.util.*;
 
 public class Main {
 
-    static int MAX_RUNS;
+    static int RUN_ID;
     static int SEED;
     static int MAX_CHANGES;
     static int CHANGE_FREQUENCY;
@@ -27,7 +27,6 @@ public class Main {
     static int POPULATION_SIZE;
     static String OUTPUT_FILE;
 
-    static int RUN_ID;
     static double[] INITIAL_RECORD;
 
     public static void main(String[] args) {
@@ -38,7 +37,7 @@ public class Main {
 
         try {
 
-            MAX_RUNS = Integer.parseInt(args[0]);
+            RUN_ID = Integer.parseInt(args[0]);
             SEED = Integer.parseInt(args[1]);
             MAX_CHANGES = Integer.parseInt(args[2]);
             CHANGE_FREQUENCY = Integer.parseInt(args[3]);
@@ -133,10 +132,8 @@ public class Main {
 
     public static void runJinApproach() {
 
-        for (RUN_ID = 0; RUN_ID < MAX_RUNS ; RUN_ID++) {
-
-            int algorithmSeed = RUN_ID+1;
-            Random rand = new Random(algorithmSeed);
+        int algorithmSeed = SEED + RUN_ID;
+        Random rand = new Random(algorithmSeed);
             RMPBI problem = createProblem();
 
             Swarm swarm = new Swarm(POPULATION_SIZE, problem.dimension);
@@ -188,16 +185,14 @@ public class Main {
                 jinEvaluator.saveEnvironmentData(swarm.x, swarm.f);
                 iterInit = 2;
             }
-        }
+
 
     }
 
     public static void runPSOPerfectEvaluation() {
 
-        for (RUN_ID = 0; RUN_ID < MAX_RUNS ; RUN_ID++) {
-
-            int algorithmSeed = RUN_ID+1;
-            Random rand = new Random(algorithmSeed);
+        int algorithmSeed = SEED + RUN_ID;
+        Random rand = new Random(algorithmSeed);
             RMPBI problem = createProblem();
 
             Swarm swarm = new Swarm(POPULATION_SIZE, problem.dimension);
@@ -226,8 +221,8 @@ public class Main {
                 reinitializeSwarm(swarm, problem, perfectEvaluator, rand);
                 printPerformance(RUN_ID, currentChange, 1, problem.trueEval(swarm.gx));
                 iterInit = 2;
+
             }
-        }
     }
 
     static class JinEvaluator implements RobustnessEvaluator {
