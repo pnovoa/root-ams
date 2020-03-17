@@ -30,7 +30,7 @@ public class Main {
         }
     }
 
-    static class PresentEvaluator implements RobustnessEvaluator{
+    static class PresentEvaluator implements RobustnessEvaluator {
 
         @Override
         public double evaluate(RMPBI problem, double[] x) {
@@ -38,118 +38,34 @@ public class Main {
         }
     }
 
-    static class JinEvaluator implements RobustnessEvaluator{
+    public static void main(String[] args) {
+        if (args == null || args.length == 0) {
+            System.out.println("Arguments required...");
+            System.exit(0);
+        }
 
-        int AR_ORDER = 4;
-        int K=20;
-        LinkedList<DataBaseEnvironment> pastEnvironments = new LinkedList<>();
-        DataBaseEnvironment currentEnvironment;
+        try {
 
-        public void createNewEnvironment(RMPBI problem) {
-            this.pastEnvironments.addLast(new DataBaseEnvironment());
-            this.currentEnvironment = this.pastEnvironments.getLast();
-            if(this.pastEnvironments.size()>problem.learningPeriod){
-                this.pastEnvironments.removeFirst();
+            MAX_RUNS = Integer.parseInt(args[0]);
+            SEED = Integer.parseInt(args[1]);
+            MAX_CHANGES = Integer.parseInt(args[2]);
+            CHANGE_FREQUENCY = Integer.parseInt(args[3]);
+            CHANGE_TYPE = Integer.parseInt(args[4]);
+            FUTURE_HORIZON = Integer.parseInt(args[5]);
+            ALGORITHM_ID = Integer.parseInt(args[6]);
+            POPULATION_SIZE = Integer.parseInt(args[7]);
+            OUTPUT_FILE = args[8];
+
+            printHeadOfOutputFile();
+
+            if (ALGORITHM_ID == 1) {
+                runPSOPerfectEvaluation();
+            } else if (ALGORITHM_ID == 2) {
+                runJinApproach();
             }
+        } catch (IllegalArgumentException exception) {
+
         }
-
-        class SortableStructure implements Comparable<SortableStructure>{
-
-            double distance;
-            int originalIndex;
-
-            @Override
-            public int compareTo(SortableStructure o) {
-                if(distance>o.distance)
-                    return 1;
-                if(distance<o.distance)
-                    return -1;
-                return 0;
-            }
-        }
-
-
-        @Override
-        public double evaluate(RMPBI problem, double[] x) {
-
-            double[] pastY = evaluateInThePast(x);
-
-            double presentY = problem.eval(x);
-
-            double[] timeSeries = Utils.appendValueToVector(presentY, pastY);
-
-            double[] futureY = evaluateInTheFuture(timeSeries, problem);
-
-            return problem.assistedEval(presentY, futureY);
-        }
-
-        public double[] evaluateInThePast(double x[]){
-
-            double[] result = new double[pastEnvironments.size()];
-            for (int i = 0; i < pastEnvironments.size(); i++) {
-                result[i] = evalPastEnvironment(pastEnvironments.get(i), x);
-            }
-            return result;
-        }
-
-        public double[] evaluateInTheFuture(double[] timeSeries, RMPBI problem){
-
-            ArimaParams arp = new ArimaParams(AR_ORDER, 0,0,0,0,0,0);
-
-            ForecastResult forecastResult = Arima.forecast_arima(timeSeries, problem.timeWindows-1, arp);
-
-            return forecastResult.getForecast();
-        }
-
-        private double evalPastEnvironment(DataBaseEnvironment environment, double[] x){
-
-            EuclideanDistance euclideanDistance = new EuclideanDistance();
-
-            ArrayList<SortableStructure> listDistances = new ArrayList<>();
-
-            for (int i = 0; i < environment.dataBaseX.length ; i++) {
-
-                double distance = euclideanDistance.d(environment.dataBaseX[i], x);
-
-                if(distance == 0){
-                    return environment.dataBaseY[i];
-                }
-                SortableStructure sortable = new SortableStructure();
-                sortable.originalIndex = i;
-                sortable.distance = distance;
-                listDistances.add(sortable);
-            }
-
-            Collections.sort(listDistances);
-
-            // Fit a RBF Network with K nearest points to x
-
-            int trainingSize = 2*K;
-
-            double[][] trainingX = new double[trainingSize][x.length];
-            double[] trainingY = new double[trainingSize];
-
-            for (int i = 0; i < trainingSize; i++) {
-                int index = listDistances.get(i).originalIndex;
-                System.arraycopy(environment.dataBaseX[index], 0, trainingX[i], 0, x.length);
-                trainingY[i] = environment.dataBaseY[index];
-            }
-
-            KMeans kMeans = KMeans.fit(trainingX, this.K);
-
-            RBF<double[]>[] rbfs = RBF.<double[]>of(kMeans.centroids, new GaussianRadialBasis(), euclideanDistance);
-            RBFNetwork<double[]> rbfNetwork = RBFNetwork.<double[]>fit(trainingX, trainingY, rbfs);
-
-            return rbfNetwork.predict(x);
-        }
-
-
-        public void saveEnvironmentData(double[][] x, double y[]){
-
-            this.currentEnvironment.append(x, y);
-        }
-
-
     }
 
     static class DataBaseEnvironment{
@@ -174,7 +90,6 @@ public class Main {
 
         }
     }
-
 
     static class Swarm{
 
@@ -218,23 +133,6 @@ public class Main {
     static int RUN_ID;
     static double[] INITIAL_RECORD;
 
-
-
-    public static void main(String[] args) {
-
-        printHeadOfOutputFile();
-
-
-        if(ALGORITHM_ID==1){
-            runPSOPerfectEvaluation();
-        }
-        else if(ALGORITHM_ID==2){
-            runJinApproach();
-        }
-
-    }
-
-
     public static void runJinApproach() {
 
         for (RUN_ID = 0; RUN_ID < MAX_RUNS ; RUN_ID++) {
@@ -257,7 +155,7 @@ public class Main {
             jinEvaluator.createNewEnvironment(problem);
             jinEvaluator.saveEnvironmentData(swarm.x, swarm.f);
 
-            int iterInit = 0;
+            int iterInit = 1;
             for (currentChange = 0; currentChange < problem.learningPeriod; currentChange++) {
                 for (int iter = iterInit;  iter < maxIterations; iter++) {
                     //currentIteration++;
@@ -296,8 +194,6 @@ public class Main {
 
     }
 
-
-
     public static void runPSOPerfectEvaluation() {
 
         for (RUN_ID = 0; RUN_ID < MAX_RUNS ; RUN_ID++) {
@@ -319,7 +215,7 @@ public class Main {
             initializeSwarm(swarm, problem, perfectEvaluator, rand);
             printPerformance(RUN_ID, currentChange, currentIteration, problem.trueEval(swarm.gx));
 
-            int iterInit = 0;
+            int iterInit = 1;
             for (currentChange = 0; currentChange < MAX_CHANGES; currentChange++) {
                 for (int iter = iterInit;  iter < maxIterations; iter++) {
                     //currentIteration++;
@@ -339,7 +235,121 @@ public class Main {
 
     }
 
-    public static RMPBI createProblem(){
+    static class JinEvaluator implements RobustnessEvaluator {
+
+        int AR_ORDER = 4;
+        int K = 20;
+        LinkedList<DataBaseEnvironment> pastEnvironments = new LinkedList<>();
+        DataBaseEnvironment currentEnvironment;
+
+        public void createNewEnvironment(RMPBI problem) {
+            this.pastEnvironments.addLast(new DataBaseEnvironment());
+            this.currentEnvironment = this.pastEnvironments.getLast();
+            if (this.pastEnvironments.size() > problem.learningPeriod) {
+                this.pastEnvironments.removeFirst();
+            }
+        }
+
+        class SortableStructure implements Comparable<SortableStructure> {
+
+            double distance;
+            int originalIndex;
+
+            @Override
+            public int compareTo(SortableStructure o) {
+                if (distance > o.distance)
+                    return 1;
+                if (distance < o.distance)
+                    return -1;
+                return 0;
+            }
+        }
+
+
+        @Override
+        public double evaluate(RMPBI problem, double[] x) {
+
+            double[] pastY = evaluateInThePast(x);
+
+            double presentY = problem.eval(x);
+
+            double[] timeSeries = Utils.appendValueToVector(presentY, pastY);
+
+            double[] futureY = evaluateInTheFuture(timeSeries, problem);
+
+            return problem.assistedEval(presentY, futureY);
+        }
+
+        public double[] evaluateInThePast(double[] x) {
+
+            double[] result = new double[pastEnvironments.size()];
+            for (int i = 0; i < pastEnvironments.size(); i++) {
+                result[i] = evalPastEnvironment(pastEnvironments.get(i), x);
+            }
+            return result;
+        }
+
+        public double[] evaluateInTheFuture(double[] timeSeries, RMPBI problem) {
+
+            ArimaParams arp = new ArimaParams(AR_ORDER, 0, 0, 0, 0, 0, 0);
+
+            ForecastResult forecastResult = Arima.forecast_arima(timeSeries, problem.timeWindows - 1, arp);
+
+            return forecastResult.getForecast();
+        }
+
+        private double evalPastEnvironment(DataBaseEnvironment environment, double[] x) {
+
+            EuclideanDistance euclideanDistance = new EuclideanDistance();
+
+            ArrayList<SortableStructure> listDistances = new ArrayList<>();
+
+            for (int i = 0; i < environment.dataBaseX.length; i++) {
+
+                double distance = euclideanDistance.d(environment.dataBaseX[i], x);
+
+                if (distance == 0) {
+                    return environment.dataBaseY[i];
+                }
+                SortableStructure sortable = new SortableStructure();
+                sortable.originalIndex = i;
+                sortable.distance = distance;
+                listDistances.add(sortable);
+            }
+
+            Collections.sort(listDistances);
+
+            // Fit a RBF Network with K nearest points to x
+
+            int trainingSize = 2 * K;
+
+            double[][] trainingX = new double[trainingSize][x.length];
+            double[] trainingY = new double[trainingSize];
+
+            for (int i = 0; i < trainingSize; i++) {
+                int index = listDistances.get(i).originalIndex;
+                System.arraycopy(environment.dataBaseX[index], 0, trainingX[i], 0, x.length);
+                trainingY[i] = environment.dataBaseY[index];
+            }
+
+            KMeans kMeans = KMeans.fit(trainingX, this.K);
+
+            RBF<double[]>[] rbfs = RBF.of(kMeans.centroids, new GaussianRadialBasis(), euclideanDistance);
+            RBFNetwork<double[]> rbfNetwork = RBFNetwork.fit(trainingX, trainingY, rbfs);
+
+            return rbfNetwork.predict(x);
+        }
+
+
+        public void saveEnvironmentData(double[][] x, double[] y) {
+
+            this.currentEnvironment.append(x, y);
+        }
+
+
+    }
+
+    public static RMPBI createProblem() {
 
         SEED += 123;
         RMPBI problem = new RMPBI();

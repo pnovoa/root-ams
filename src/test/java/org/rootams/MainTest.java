@@ -2,8 +2,6 @@ package org.rootams;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class MainTest {
 
     @Test
@@ -20,14 +18,12 @@ public class MainTest {
         Main.POPULATION_SIZE = 50;
         Main.OUTPUT_FILE = "test.out";
 
-        Main.main(null);
+        //Main.main(null);
 
     }
 
     @Test
     public void mainJin() {
-
-
         Main.MAX_RUNS = 1;
         Main.SEED = 1;
         Main.MAX_CHANGES = 23;
@@ -38,7 +34,7 @@ public class MainTest {
         Main.POPULATION_SIZE = 50;
         Main.OUTPUT_FILE = "test_jin.out";
 
-        Main.main(null);
+        // Main.main(null);
 
 
 
