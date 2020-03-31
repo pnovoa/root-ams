@@ -47,7 +47,7 @@ public class Main {
             POPULATION_SIZE = Integer.parseInt(args[7]);
             OUTPUT_FILE = args[8];
 
-            //printHeadOfOutputFile();
+            printHeadOfOutputFile();
 
             if (ALGORITHM_ID == 1) {
                 runPSOPerfectEvaluation();
