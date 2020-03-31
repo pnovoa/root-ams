@@ -47,7 +47,7 @@ public class Main {
             POPULATION_SIZE = Integer.parseInt(args[7]);
             OUTPUT_FILE = args[8];
 
-            printHeadOfOutputFile();
+            //printHeadOfOutputFile();
 
             if (ALGORITHM_ID == 1) {
                 runPSOPerfectEvaluation();
@@ -461,16 +461,13 @@ public class Main {
     }
 
     public static RMPBI createProblem() {
-
-        SEED += 123;
         RMPBI problem = new RMPBI();
-        problem.seed = SEED;
+        problem.seed = 123;
         problem.computationalBudget = CHANGE_FREQUENCY;
         problem.timeWindows = FUTURE_HORIZON;
         problem.changeType = CHANGE_TYPE;
         problem.init();
         return problem;
-
     }
 
     public static void initializeSwarm(Swarm swarm, RMPBI problem, RobustnessEvaluator evaluator, Random rand){
@@ -616,7 +613,10 @@ public class Main {
             System.out.print("\t" + colNames[i]);
         }
         System.out.println();
+
+
     }
 
 
+    //public static double computeRMSEPastEnvironments(RMPBI problem, int environmentsID[], double[] x)
 }
